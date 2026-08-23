@@ -1,0 +1,229 @@
+:root {
+    --ink: #182033;
+    --muted: #65708a;
+    --line: #e8ebf2;
+    --brand: #4f46e5;
+    --bg: #f7f8fc;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Arial, sans-serif;
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 14px;
+    background: var(--brand);
+    color: white;
+    font-weight: 600;
+}
+
+button.secondary {
+    background: white;
+    color: var(--ink);
+    border: 1px solid var(--line);
+}
+
+input, select {
+    width: 100%;
+    border: 1px solid #d7dce7;
+    border-radius: 8px;
+    padding: 10px;
+    background: white;
+}
+
+.shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.topbar h1 {
+    font-size: 24px;
+    margin: 0
+}
+
+.topbar p {
+    color: var(--muted);
+    margin: 5px 0 0
+}
+
+.layout {
+    display: grid;
+    grid-template-columns:290px 1fr;
+    gap: 22px;
+}
+
+.panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.panel h2 {
+    font-size: 15px;
+    margin: 0 0 14px
+}
+
+.calendar-list {
+    display: grid;
+    gap: 8px
+}
+
+.calendar-item {
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    color: var(--ink);
+    border: 1px solid var(--line)
+}
+
+.calendar-item.active {
+    border-color: var(--brand);
+    background: #eef2ff
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+    margin-right: 8px
+}
+
+.form {
+    display: grid;
+    gap: 10px
+}
+
+.form label {
+    font-size: 13px;
+    font-weight: 600
+}
+
+.hint {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5
+}
+
+.row {
+    display: flex;
+    gap: 9px;
+    align-items: center
+}
+
+.calendar-wrap {
+    min-width: 0
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: #18203399;
+    display: grid;
+    place-items: center;
+    padding: 18px
+}
+
+.modal {
+    width: min(460px, 100%);
+    background: white;
+    border-radius: 14px;
+    padding: 22px
+}
+
+.modal h2 {
+    margin-top: 0
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px
+}
+
+.empty {
+    color: var(--muted);
+    padding: 28px 0;
+    text-align: center
+}
+
+@media (max-width: 760px) {
+    .shell {
+        padding: 16px
+    }
+
+    .layout {
+        grid-template-columns:1fr
+    }
+
+    .topbar {
+        align-items: flex-start;
+        gap: 10px
+    }
+
+    .topbar button {
+        white-space: nowrap
+    }
+}
+
+.modal {
+    position: relative;
+    padding: 24px;
+}
+
+.modal h2 {
+    margin: 0 0 18px;
+}
+
+.modal.form {
+    gap: 16px;
+}
+
+.modal.form label {
+    display: grid;
+    gap: 7px;
+    line-height: 1.2;
+}
+
+.modal.form input {
+    min-height: 42px;
+}
+
+.modal-actions {
+    margin-top: 4px;
+}
+
+/* FullCalendar보다 일정 등록 모달을 항상 앞에 표시 */
+.modal-backdrop {
+    z-index: 9999 !important;
+}
+
+.modal {
+    position: relative;
+    z-index: 10000 !important;
+    background: #ffffff !important;
+}
