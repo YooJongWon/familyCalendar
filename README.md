@@ -16,3 +16,10 @@ Next.js + Supabase + FullCalendar 기반 권한별 단체 캘린더입니다. �
 - 암호키는 데이터베이스에 저장되지 않습니다. 구성원에게 별도 안전한 채널로 전달하세요. 분실하면 과거 일정의 제목과 메모를 복구할 수 없습니다.
 
 Vercel에는 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` 환경 변수를 등록한 뒤 저장소를 연결하여 배포합니다.
+
+## 기존 프로젝트 업데이트
+
+이미 기존 `schema.sql`을 실행했다면, Supabase SQL Editor에서
+`supabase/migrations/20260823_add_questions.sql`을 실행해 Q&A 게시판 테이블과 권한을 추가하세요.
+
+로그인 정보는 브라우저에 저장되지 않으므로, 페이지를 새로 열면 다시 로그인해야 합니다.

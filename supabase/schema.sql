@@ -44,3 +44,15 @@ declare target_user uuid; begin
  insert into public.calendar_members(calendar_id,user_id,role) values(target_calendar,target_user,member_role) on conflict(calendar_id,user_id) do update set role=excluded.role;
 end; $$;
 grant execute on function public.invite_calendar_member(uuid,text,public.calendar_role) to authenticated;
+
+-- Q&A 게시판
+create table public.questions (
+  id uuid primary key default gen_random_uuid(),
+  title text not null check (char_length(title) between 1 and 120),
+  content text not null check (char_length(content) between 1 and 5000),
+  author_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.questions enable row level security;
+create policy "authenticated users see questions" on public.questions for select to authenticated using (true);
+create policy "authenticated users add questions" on public.questions for insert to authenticated with check (auth.uid() = author_id);

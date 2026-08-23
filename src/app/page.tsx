@@ -7,7 +7,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import { createClient } from "@/lib/supabase/client";
 import { decryptEvent, encryptEvent } from "@/lib/crypto";
-import type { Calendar, EncryptedEvent, Membership } from "@/types/database";
+import type { Calendar, EncryptedEvent, Question } from "@/types/database";
 
 type EventDraft = { start: string; end: string; allDay: boolean } | null;
 
@@ -100,6 +100,11 @@ export default function Home() {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("editor");
+  const [view, setView] = useState<"calendar" | "questions">("calendar");
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionOpen, setQuestionOpen] = useState(false);
+  const [questionTitle, setQuestionTitle] = useState("");
+  const [questionContent, setQuestionContent] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setReady(Boolean(data.user)));
@@ -118,6 +123,36 @@ export default function Home() {
       .filter(Boolean) as Calendar[];
     setCalendars(list);
     if (!selected && list[0]) setSelected(list[0]);
+  }
+
+  async function loadQuestions() {
+    const { data, error } = await supabase
+      .from("questions")
+      .select("id,title,content,author_id,created_at,profiles(email,display_name)")
+      .order("created_at", { ascending: false });
+    if (error) return setError(error.message);
+    setQuestions((data ?? []) as Question[]);
+  }
+
+  async function openQuestions() {
+    setView("questions");
+    await loadQuestions();
+  }
+
+  async function addQuestion(event: FormEvent) {
+    event.preventDefault();
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) return setError("로그인 정보를 확인할 수 없습니다. 다시 로그인해 주세요.");
+    const { error } = await supabase.from("questions").insert({
+      title: questionTitle,
+      content: questionContent,
+      author_id: user.user.id,
+    });
+    if (error) return setError(error.message);
+    setQuestionTitle("");
+    setQuestionContent("");
+    setQuestionOpen(false);
+    await loadQuestions();
   }
 
   async function loadEvents(calendarId: string, passphrase: string) {
@@ -233,11 +268,25 @@ export default function Home() {
           <h1>함께 캘린더</h1>
           <p>필요한 조합만 골라 공유하세요.</p>
         </div>
-        <button className="secondary" onClick={signOut}>
-          로그아웃
-        </button>
+        <div className="row">
+          <button
+            className={`secondary tab ${view === "calendar" ? "active" : ""}`}
+            onClick={() => setView("calendar")}
+          >
+            캘린더
+          </button>
+          <button
+            className={`secondary tab ${view === "questions" ? "active" : ""}`}
+            onClick={openQuestions}
+          >
+            Q&A
+          </button>
+          <button className="secondary" onClick={signOut}>
+            로그아웃
+          </button>
+        </div>
       </header>
-      <div className="layout">
+      {view === "calendar" ? <div className="layout">
         <aside className="panel">
           <h2>내 캘린더</h2>
           <div className="calendar-list">
@@ -353,7 +402,28 @@ export default function Home() {
             </>
           )}
         </section>
-      </div>
+      </div> : <section className="panel board">
+        <div className="board-header">
+          <div>
+            <h2>Q&A 게시판</h2>
+            <p className="hint">캘린더 사용 중 궁금한 점을 남겨 주세요.</p>
+          </div>
+          <button onClick={() => setQuestionOpen(true)}>질문 등록</button>
+        </div>
+        <div className="question-list">
+          {questions.length === 0 ? (
+            <p className="empty">아직 등록된 질문이 없습니다.</p>
+          ) : questions.map((question) => (
+            <article className="question-card" key={question.id}>
+              <h3>{question.title}</h3>
+              <p>{question.content}</p>
+              <p className="question-meta">
+                {question.profiles[0]?.display_name || question.profiles[0]?.email || "익명"} · {new Date(question.created_at).toLocaleDateString("ko-KR")}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>}
       {error && (
         <p
           style={{
@@ -444,6 +514,36 @@ export default function Home() {
                 취소
               </button>
               <button>저장</button>
+            </div>
+          </form>
+        </div>
+      )}
+      {questionOpen && (
+        <div className="modal-backdrop">
+          <form className="modal form" onSubmit={addQuestion}>
+            <h2>질문 등록</h2>
+            <label>
+              제목
+              <input
+                value={questionTitle}
+                onChange={(e) => setQuestionTitle(e.target.value)}
+                maxLength={120}
+                required
+                autoFocus
+              />
+            </label>
+            <label>
+              내용
+              <textarea
+                value={questionContent}
+                onChange={(e) => setQuestionContent(e.target.value)}
+                maxLength={5000}
+                required
+              />
+            </label>
+            <div className="modal-actions">
+              <button type="button" className="secondary" onClick={() => setQuestionOpen(false)}>취소</button>
+              <button>등록</button>
             </div>
           </form>
         </div>

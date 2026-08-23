@@ -37,12 +37,28 @@ button.secondary {
     border: 1px solid var(--line);
 }
 
-input, select {
+button.tab {
+    padding: 8px 12px;
+}
+
+button.tab.active {
+    background: #eef2ff;
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+input, select, textarea {
     width: 100%;
     border: 1px solid #d7dce7;
     border-radius: 8px;
     padding: 10px;
     background: white;
+}
+
+textarea {
+    width: 100%;
+    min-height: 130px;
+    resize: vertical;
 }
 
 .shell {
@@ -169,6 +185,47 @@ input, select {
     color: var(--muted);
     padding: 28px 0;
     text-align: center
+}
+
+.board {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.board-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.question-list {
+    display: grid;
+    gap: 10px;
+}
+
+.question-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.question-card h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.question-card p {
+    margin: 0;
+    white-space: pre-wrap;
+    line-height: 1.55;
+}
+
+.question-meta {
+    margin-top: 12px !important;
+    color: var(--muted);
+    font-size: 12px;
 }
 
 @media (max-width: 760px) {
