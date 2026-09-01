@@ -418,7 +418,7 @@ export default function Home() {
               <h3>{question.title}</h3>
               <p>{question.content}</p>
               <p className="question-meta">
-                {question.profiles[0]?.display_name || question.profiles[0]?.email || "익명"} · {new Date(question.created_at).toLocaleDateString("ko-KR")}
+                익명 · {new Date(question.created_at).toLocaleDateString("ko-KR")}
               </p>
             </article>
           ))}
