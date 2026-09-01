@@ -128,7 +128,7 @@ export default function Home() {
   async function loadQuestions() {
     const { data, error } = await supabase
       .from("questions")
-      .select("id,title,content,author_id,created_at,profiles(email,display_name)")
+      .select("id,title,content,author_id,created_at")
       .order("created_at", { ascending: false });
     if (error) return setError(error.message);
     setQuestions((data ?? []) as Question[]);
