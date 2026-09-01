@@ -8,6 +8,7 @@ import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import { createClient } from "@/lib/supabase/client";
 import { decryptEvent, encryptEvent } from "@/lib/crypto";
 import type { Calendar, EncryptedEvent, Question } from "@/types/database";
+import { EventClickArg } from "@fullcalendar/core";
 
 type EventDraft = { start: string; end: string; allDay: boolean } | null;
 
@@ -86,6 +87,7 @@ export default function Home() {
       start: string;
       end: string;
       allDay: boolean;
+      extendedProps: { note: string };
     }[]
   >([]);
   const [key, setKey] = useState("");
@@ -105,6 +107,8 @@ export default function Home() {
   const [questionOpen, setQuestionOpen] = useState(false);
   const [questionTitle, setQuestionTitle] = useState("");
   const [questionContent, setQuestionContent] = useState("");
+  const [eventDetailOpen, setEventDetailOpen] = useState(false);
+  const [selectedEventDetail, setSelectedEventDetail] = useState<{title: string; note: string} | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setReady(Boolean(data.user)));
@@ -176,6 +180,9 @@ export default function Home() {
               start: item.starts_at,
               end: item.ends_at,
               allDay: item.all_day,
+              extendedProps: {
+                note: decoded.note || "", // 💡 메모 데이터를 FullCalendar로 전달
+              }
             };
           }),
         ),
@@ -398,6 +405,14 @@ export default function Home() {
                     allDay: arg.allDay,
                   })
                 }
+                eventClick={(arg: EventClickArg) => {
+                  // 달력에 있는 일정을 클릭했을 때 실행
+                  setSelectedEventDetail({
+                    title: arg.event.title,
+                    note: arg.event.extendedProps.note,
+                  });
+                  setEventDetailOpen(true); // 팝업 열기
+                }}
               />
             </>
           )}
@@ -547,6 +562,30 @@ export default function Home() {
             </div>
           </form>
         </div>
+      )}
+      {eventDetailOpen && selectedEventDetail && (
+          <div className="modal-backdrop">
+            <div className="modal form">
+              <h2>일정 상세</h2>
+              <div style={{ padding: "10px 0", lineHeight: "1.6" }}>
+                <h3 style={{ margin: "0 0 10px 0", fontSize: "1.2rem" }}>
+                  {selectedEventDetail.title}
+                </h3>
+                <p style={{ margin: 0, whiteSpace: "pre-wrap", color: "var(--text-secondary, #555)" }}>
+                  {selectedEventDetail.note || "작성된 메모가 없습니다."}
+                </p>
+              </div>
+              <div className="modal-actions">
+                <button
+                    type="button"
+                    onClick={() => setEventDetailOpen(false)}
+                    style={{ width: "100%" }}
+                >
+                  닫기
+                </button>
+              </div>
+            </div>
+          </div>
       )}
     </main>
   );
